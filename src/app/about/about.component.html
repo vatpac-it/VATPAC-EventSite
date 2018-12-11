@@ -1,0 +1,14 @@
+<div class="about-info--item">
+  <h3 class="about-info--title">{{item.title}}</h3>
+
+  <div class="img-wrapper about-info--icon">
+    <img src="../../assets/img/{{item.icon}}" alt="">
+  </div>
+  <div class="about-info--info-lines">
+    <div>
+      <span class="info-line" [class.text-s-red]="item.reverselines === true">{{item.line1}}</span>
+      <span class="info-line" [class.text-s-red]="item.reverselines === false">{{item.line2}}</span>
+      <!--[class.text-center]="item.centerlines === true"-->
+    </div>
+  </div>
+</div>

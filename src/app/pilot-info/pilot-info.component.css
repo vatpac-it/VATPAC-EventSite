@@ -1,0 +1,55 @@
+.pilotInfo {
+  width: 90%;
+  margin: 50px auto;
+  overflow: auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pilotInfo > div {
+  flex-basis: 48%;
+  min-width: 290px;
+}
+
+.charts--container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.charts--container .chart--slider {
+  margin: 20px 10px;
+  width: 100%;
+}
+
+.charts--container .chart--slider .chart--wrapper {
+  position: relative;
+}
+
+.charts--container .chart--slider .chart--wrapper iframe {
+  width: auto;
+  height: auto;
+  min-width: 300px;
+  min-height: 415px;
+  margin: 0 auto;
+  display: block;
+  border: none;
+}
+
+.charts--container .chart--slider .chart--wrapper.loading iframe {
+  visibility: hidden;
+}
+
+.charts--container .chart--slider .chart--wrapper.loading:after {
+  content: 'Loading...';
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  position: absolute;
+  top: calc(50% - 9px);
+  left: 0;
+  width: 100%;
+}
