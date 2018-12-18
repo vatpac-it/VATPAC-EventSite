@@ -1,0 +1,11 @@
+<table>
+  <tr>
+    <td class="airport-title" (click)="setFilter(airport, '')" [class.selected]="currentFilter.airport === airport && currentFilter.postion === ''">{{airport !== '' ? airport : 'All'}}</td>
+    <td [class.text-dblue]="airport !== ''" (click)="setFilter(airport, 'DEL')" [class.selected]="currentFilter.airport === airport && currentFilter.postion === 'DEL'">DEL</td>
+    <td [class.text-lblue]="airport !== ''" (click)="setFilter(airport, 'GND')" [class.selected]="currentFilter.airport === airport && currentFilter.postion === 'GND'">GND</td>
+    <td [class.text-orange]="airport !== ''" (click)="setFilter(airport, 'TWR')" [class.selected]="currentFilter.airport === airport && currentFilter.postion === 'TWR'">TWR</td>
+    <td [class.text-red]="airport !== ''" (click)="setFilter(airport, 'APP')" [class.selected]="currentFilter.airport === airport && currentFilter.postion === 'APP'">APP</td>
+    <td [class.text-pink]="airport !== ''" (click)="setFilter(airport, 'DEP')" [class.selected]="currentFilter.airport === airport && currentFilter.postion === 'DEP'">DEP</td>
+    <td [class.text-green]="airport !== ''" (click)="setFilter(airport, 'CTR')" [class.selected]="currentFilter.airport === airport && currentFilter.postion === 'CTR'">CTR</td>
+  </tr>
+</table>

@@ -1,0 +1,71 @@
+.about-info--item {
+  position: relative;
+  padding: 0 30px;
+}
+
+.about-info--item .about-info--title {
+  width: 100%;
+  font-size: 34px;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+  margin: 0;
+}
+
+.about-info--item .about-info--icon {
+  width: 128px;
+  height: 128px;
+  float: left;
+}
+
+.about-info--item .about-info--info-lines {
+  display: inline-block;
+  margin-left: 15px;
+  height: 128px;
+  min-width: 250px;
+}
+
+.about-info--item .about-info--info-lines > div {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.about-info--item .about-info--info-lines > div .info-line {
+  margin: 2.5px 0;
+  display: block;
+  letter-spacing: 0.05em;
+  font-size: 20px;
+}
+
+/*.about-info--item .about-info--info-lines > div .info-line.text-center {*/
+  /*text-align: center;*/
+/*}*/
+
+/*MEDIA QUERY*/
+@media only screen and (max-width : 505px) {
+
+  .about-info--item {
+    margin-bottom: 40px;
+  }
+
+  .about-info--item .about-info--title {
+    text-align: center;
+  }
+
+  .about-info--item .about-info--icon {
+    float: none;
+    margin: 0 auto;
+  }
+
+  .about-info--item .about-info--info-lines {
+    margin-left: 0;
+    padding: 15px 0;
+    height: auto;
+  }
+
+  .about-info--item .about-info--info-lines > div .info-line {
+    text-align: center;
+  }
+
+}

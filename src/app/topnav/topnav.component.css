@@ -1,0 +1,134 @@
+.navbar {
+  width: 100%;
+  height: 70px;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar:before {
+  content: '';
+  width: 100%;
+  height: 0;
+  background: #e5e5e5;
+  border-bottom: 4px solid #00a3e2;
+  position: absolute;
+  top: -4px;
+  left: 0;
+  z-index: -1;
+  transition: all .2s ease;
+}
+
+.navbar.scrolled:before {
+  top: 0;
+  height: 100%;
+}
+
+.navbar--brand {
+  height: 97%;
+  max-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar--brand img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.navbar #menu-icon {
+  display: none;
+  margin-right: 15px;
+  position: relative;
+  height: 13px;
+  padding-left: 1.25em;
+}
+
+.navbar #menu-icon:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.3em;
+  height: 0.20em;
+  background: #fff;
+  box-shadow:
+    0 0.3em 0 0 #fff,
+    0 0.6em 0 0 #fff;
+}
+
+.navbar.scrolled #menu-icon:before,
+.navbar.visible #menu-icon:before {
+  background: #000;
+  box-shadow:
+    0 0.3em 0 0 #000,
+    0 0.6em 0 0 #000;
+}
+
+.navbar--items {
+  float: right;
+  list-style: none;
+  margin-right: 10px;
+}
+
+.navbar--items .navbar--item {
+  display: inline-block;
+  padding: 0 15px;
+}
+
+.navbar--items .navbar--item a.link--item {
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  font-size: 21px;
+  font-weight: 300;
+  transition: color .2s ease;
+  cursor: pointer;
+}
+
+.navbar.scrolled .navbar--items .navbar--item a.link--item {
+  color: #000;
+}
+
+/*MEDIA QUERY*/
+@media only screen and (max-width : 775px) {
+
+  .navbar #menu-icon {
+    display: inline-block;
+  }
+
+  .navbar .navbar--items {
+    display: none;
+    position: fixed;
+    padding: 70px 20px 20px;
+    background: #fff;
+    left: 0;
+    right: 0;
+    top: 0;
+    transform: translateY(-300px);
+    width: calc(100% - 40px);
+    z-index: -1;
+    margin: 0;
+    transition: all 1s ease;
+  }
+
+  .navbar .navbar--items .navbar--item {
+    text-align: center;
+    width: 100%;
+    padding: 5px 0;
+  }
+
+  .navbar .navbar--items .navbar--item a.link--item {
+    color: #000;
+  }
+
+  .navbar.visible .navbar--items {
+    display: block;
+    transform: translateY(0);
+  }
+}

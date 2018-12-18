@@ -1,0 +1,28 @@
+<div class="multi-select--wrapper light">
+  <div>
+    <button *ngFor="let date of dates" class="multi-select" [class.selected]="date === currentDate" (click)="setTimesForDay(date)">{{formatDate(date)}}</button>
+  </div>
+</div>
+
+<!--<h4>Filter by</h4>-->
+<app-airport-line *ngFor="let airport of airports" [airport]="airport" (airportFilter)="filterTimes($event)" [currentFilter]="currentFilter"></app-airport-line>
+
+<div class="atc-timeline--container">
+  <div class="timeline-labels">
+    <span *ngFor="let time of filteredTimes" class="position-title">{{time.airport}} {{time.position}}</span>
+    <span class="position-title base-title">(Browser Local)</span>
+  </div>
+
+  <div class="timelines--container">
+    <app-atc-timeline *ngFor="let time of filteredTimes" [times]="time.times" [airport]="time.airport" [position]="time.position" [selectedTimes]="selectedTimes[formatDate(currentDate)]" (selectTimesEvent)="this.selectedTimes[formatDate(currentDate)] = $event" [shifts]="shifts"></app-atc-timeline>
+
+    <ul class="timeline">
+      <li *ngFor="let time of timelineTimes">
+        <div class="status"></div>
+        <span>{{formatTime(time)}}</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<button class="save-times--btn" [disabled]="!timesAreSelected()">Save All Selected Times</button>
