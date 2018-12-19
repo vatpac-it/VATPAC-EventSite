@@ -1,7 +1,5 @@
 <div class="multi-select--wrapper light">
-  <div>
-    <button *ngFor="let date of dates" class="multi-select" [class.selected]="date === currentDate" (click)="setTimesForDay(date)">{{formatDate(date)}}</button>
-  </div>
+  <button *ngFor="let date of dates" class="multi-select" [class.selected]="date === currentDate" (click)="setTimesForDay(date)">{{formatDate(date)}}</button>
 </div>
 
 <!--<h4>Filter by</h4>-->

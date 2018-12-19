@@ -1,4 +1,4 @@
-export interface About_Item {
+export interface AboutItem {
   title: string;
   icon: string;
   line1: string;

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import { About_Item } from "./About_Item";
+import { AboutItem } from './AboutItem';
 
 @Component({
   selector: 'app-about',
@@ -8,7 +8,7 @@ import { About_Item } from "./About_Item";
 })
 export class AboutComponent implements OnInit {
 
-  @Input() item: About_Item;
+  @Input() item: AboutItem;
 
   constructor() { }
 

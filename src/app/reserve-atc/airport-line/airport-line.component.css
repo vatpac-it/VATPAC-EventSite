@@ -116,6 +116,7 @@ td.selected {
   color: #fff;
 }
 
+/*noinspection CssUnusedSymbol,CssUnusedSymbol,CssUnusedSymbol*/
 .text-green.selected {
   box-shadow: 0 0 0 1px #00a403;
 }

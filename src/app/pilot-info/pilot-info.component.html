@@ -9,7 +9,8 @@
     <div class="chart--slider">
       <div class="chart--wrapper" [class.loading]="!frameVisible">
         <iframe name="chartFrame" [src]="safeURL()">
-          This browser does not support PDFs. Please download the PDF to view it: <a href="{{viewerURL}}">Download PDF</a>
+          This browser does not support PDFs. Please download the PDF to view it: <!--suppress HtmlUnknownTag, HtmlUnknownTag -->
+          <a href="{{viewerURL}}">Download PDF</a>
         </iframe>
       </div>
     </div>
