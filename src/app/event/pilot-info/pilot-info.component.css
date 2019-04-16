@@ -8,8 +8,13 @@
   flex-wrap: wrap;
 }
 
+.pilotInfo p {
+  letter-spacing: 0.04em;
+  text-align: justify;
+}
+
 .pilotInfo > div {
-  flex-basis: 48%;
+  flex-basis: 90%;
   min-width: 290px;
 }
 

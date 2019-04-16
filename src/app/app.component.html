@@ -1,48 +1,8 @@
-<div class="header--hero">
-  <app-topnav></app-topnav>
-
-  <div class="header--container">
-    <div class="bg-img"></div>
-
-    <div class="content--wrapper">
-      <h1 class="event-name">{{data.title}}</h1>
-      <h2 class="primary-location">{{data.subTitle}}</h2>
-    </div>
-  </div>
+<div class="beta">
+  <p>The new VATPAC Event site is currently in beta, if you expereience any problems or have any feedback, please email
+    <a href="mailto:it@vatpac.org">it@vatpac.org</a>.</p>
 </div>
 
-<div id="aboutAnchor" class="about-info--container">
-  <div class="about-info--row">
-
-    <app-about [item]="{title: 'Departing', icon: 'departure-icon.png', line1: data.airports[0].name, line2: '('+data.airports[0].icao+')', reverselines: false, centerlines: true}"></app-about>
-
-    <app-about [item]="{title: 'Arrival', icon: 'arrival-icon.png', line1: data.airports[1].name, line2: '('+data.airports[1].icao+')', reverselines: false, centerlines: true}"></app-about>
-  </div>
-
-  <div class="divider horizontal spaced"></div>
-
-  <div class="about-info--row">
-    <app-about [item]="{title: 'Starting', icon: 'pilot-icon.png', line1: formatDate(data.start), line2: formatTime(data.start), reverselines: true, centerlines: false}"></app-about>
-
-    <app-about [item]="{title: 'Ending', icon: 'pilot-icon.png', line1: formatDate(data.end), line2: formatTime(data.end), reverselines: true, centerlines: false}"></app-about>
-  </div>
-
-  <h2 class="section--title">About Real Ops</h2>
-  <p class="section--text" [innerHTML]="data.about"></p>
-</div>
-
-<div id="pilotAnchor" class="pilotInfo--container">
-  <h2 class="section--title text-white">Pilot Info</h2>
-
-  <app-pilot-info [data]="data"></app-pilot-info>
-</div>
-
-<div id="atcAnchor" class="reserveATC--container">
-  <h2 class="section--title">Reserve ATC</h2>
-
-  <app-reserve-atc [times]="data.positions" [shifts]="data.shifts" [start]="data.start" [end]="data.end" [selectedTimes]="data.selectedTimes || {}"></app-reserve-atc>
-</div>
-
-<div class="footer">
-  <p>&#169; VATPAC 2018</p>
+<div class="container">
+  <router-outlet></router-outlet>
 </div>

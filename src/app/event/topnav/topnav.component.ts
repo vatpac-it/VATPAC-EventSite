@@ -1,6 +1,8 @@
 import {Component, HostListener, Inject, OnInit} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
-import {WINDOW} from '../window.service';
+import {WINDOW} from '../../window.service';
+import {UserService} from "../../services/user.service";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-topnav',
@@ -10,10 +12,16 @@ import {WINDOW} from '../window.service';
 export class TopnavComponent implements OnInit {
 
   scrolled = false;
+  name: string;
 
-  constructor(@Inject(DOCUMENT) private document: Document, @Inject(WINDOW) private window: Window) { }
+  constructor(@Inject(DOCUMENT) private document: Document, @Inject(WINDOW) private window: Window, private userService: UserService, private activeRoute: ActivatedRoute) { }
 
   ngOnInit() {
+    this.userService.currentUser.subscribe((user) => {
+      if (user) {
+        this.name = user.first_name + ' ' + user.last_name;
+      }
+    });
   }
 
   @HostListener('window:scroll', [])
@@ -36,5 +44,17 @@ export class TopnavComponent implements OnInit {
     const visible = this.document.getElementById('menu-icon').offsetWidth > 0 || this.document.getElementById('menu-icon').offsetHeight > 0;
     if (el === this.document.getElementById('menu-icon') || !visible) { return; }
     this.document.querySelector('.navbar').classList.remove('visible');
+  }
+
+  loggedIn() {
+    return this.userService.loggedIn();
+  }
+
+  login() {
+    this.userService.login(this.activeRoute.snapshot.paramMap.get('sku'));
+  }
+
+  logout() {
+    this.userService.logout();
   }
 }

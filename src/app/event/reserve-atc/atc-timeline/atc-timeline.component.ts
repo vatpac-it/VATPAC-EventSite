@@ -11,17 +11,18 @@ export class AtcTimelineComponent implements OnInit {
   @Input() readonly shifts: number;
 
   @Input() times: Time[];
-  @Input() airport: string;
   @Input() position: string;
+
+  @Input() selectable: boolean = false;
 
   colorClass: string;
 
   @Input() selectedTimes: {
-    [time: string]: {airport: string, position: string}
+    [position: string]: Array<string>
   };
   @Output() selectTimesEvent: EventEmitter<{
-    [time: string]: {airport: string, position: string}
-  }> = new EventEmitter<{[p: string]: {airport: string, position: string}}>();
+    [position: string]: Array<string>
+  }> = new EventEmitter<{[position: string]: Array<string>}>();
 
   constructor() {
     this.colorClass = '';
@@ -48,6 +49,9 @@ export class AtcTimelineComponent implements OnInit {
         this.colorClass = 'green';
         break;
     }
+    if (this.position.includes('CTR')) {
+      this.colorClass = 'green';
+    }
   }
 
   getWidth(slot) {
@@ -66,20 +70,24 @@ export class AtcTimelineComponent implements OnInit {
   }
 
   selectTime(slot) {
-    if (slot.name == null && slot.rating == null) {
+    if (slot.name == null && slot.rating == null && this.selectable) {
       if (this.slotInSelected(slot)) {
-        delete this.selectedTimes[slot.start];
+        const i = this.selectedTimes[this.position].indexOf(slot.start);
+        if (i > -1) {
+          this.selectedTimes[this.position].splice(i, 1);
+        }
       } else {
-        this.selectedTimes[slot.start] = {airport: this.airport, position: this.position};
+        if (typeof this.selectedTimes[this.position] === 'undefined') {
+          this.selectedTimes[this.position] = [];
+        }
+        this.selectedTimes[this.position].push(slot.start);
       }
       this.selectTimesEvent.emit(this.selectedTimes);
     }
   }
 
   slotInSelected(slot) {
-    return slot.start in this.selectedTimes &&
-      this.selectedTimes[slot.start].airport === this.airport &&
-      this.selectedTimes[slot.start].position === this.position;
+    return typeof this.selectedTimes !== 'undefined' && typeof this.selectedTimes[this.position] !== 'undefined' && this.selectedTimes[this.position].indexOf(slot.start) > -1;
   }
 
 }

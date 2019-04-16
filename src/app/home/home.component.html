@@ -1,0 +1,12 @@
+<img src="../../assets/img/vatpac-logo.png" alt="VATPAC">
+<h1>Events</h1>
+
+<div class="event--container">
+  <a class="event" *ngFor="let event of events" [class.draft]="event.published === 0" [routerLink]="event.sku">
+    <span *ngIf="event.published === 0" class="draft--note">Unpublished</span>
+    <h4>{{event.title.toLowerCase()}}</h4>
+    <p>{{event.subTitle.toLowerCase()}}</p>
+    <span>{{event.start}}</span>
+  </a>
+  <p class="noEvents" *ngIf="!events || events.length <= 0">There are no published event pages.</p>
+</div>

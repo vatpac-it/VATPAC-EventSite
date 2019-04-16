@@ -1,6 +1,6 @@
 .about-info--item {
   position: relative;
-  padding: 0 30px;
+  padding: 40px 30px;
 }
 
 .about-info--item .about-info--title {
@@ -21,7 +21,7 @@
   display: inline-block;
   margin-left: 15px;
   height: 128px;
-  min-width: 250px;
+  min-width: 150px;
 }
 
 .about-info--item .about-info--info-lines > div {

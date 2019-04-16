@@ -1,0 +1,21 @@
+<nav class="navbar" [class.scrolled]="scrolled">
+  <a routerLink="" class="navbar--brand">
+    <img src="../../../assets/img/vatpac-logo.png" alt="">
+  </a>
+
+  <a href="javascript:void();" id="menu-icon" (click)="menuIconClick()"></a>
+
+  <ul class="navbar--items">
+    <li class="navbar--item"><a class="link--item" [ngx-scroll-to]="'aboutAnchor'">About</a></li>
+    <li class="navbar--item"><a class="link--item" [ngx-scroll-to]="'infoAnchor'">Info</a></li>
+    <li class="navbar--item"><a class="link--item" [ngx-scroll-to]="'atcAnchor'">ATC</a></li>
+    <div *ngIf="loggedIn(); then loggedInT else loggedOutT"></div>
+    <ng-template #loggedOutT>
+      <li class="navbar--item"><a class="link--item" (click)="login()">Login</a></li>
+    </ng-template>
+    <ng-template #loggedInT>
+      <li class="navbar--item" *ngIf="name"><a class="link--item">{{name}}</a></li>
+      <li class="navbar--item"><a class="link--item text-s-red" (click)="logout()">Logout</a></li>
+    </ng-template>
+  </ul>
+</nav>

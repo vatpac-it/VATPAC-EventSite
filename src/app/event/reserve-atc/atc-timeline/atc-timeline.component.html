@@ -1,0 +1,12 @@
+<div class="timeline--wrapper">
+  <ul class="timeline">
+    <li *ngFor="let slot of times" [class]="!slot.available ? colorClass : ''" [class.complete]="!slot.available || !selectable"  [class.selected]="slotInSelected(slot)" (click)="selectTime(slot)">
+      <div class="title">
+        <span *ngIf="slot.name !== null && slot.name !== ''">{{slot.name}}{{slot.rating !== null && slot.rating !== '' ? ' (' + slot.rating + ')' : ''}}</span>
+        <span *ngIf="(slot.name === null || slot.name === '') && !slot.available">Anonymous</span>
+      </div>
+      <div class="status" [style.width]="getWidth(slot)"></div>
+    </li>
+  </ul>
+
+</div>

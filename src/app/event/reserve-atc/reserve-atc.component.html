@@ -1,0 +1,57 @@
+<div class="multi-select--wrapper light">
+  <button *ngFor="let date of dates" class="multi-select" [class.selected]="date === currentDate" (click)="setTimesForDay(date)">{{formatDate(date)}}</button>
+</div>
+
+<div *ngIf="published == 1">
+  <span class="disclaimer">The postions are only preferences. If a position is already filled or a more suitable controller is rostered , you will be rostered onto the next most suitable position. If you have any questions regarding rostering please email <a href="mailto:events@vatpac.org">events@vatpac.org</a>)</span>
+
+  <div class="atc-timeline--container">
+    <div class="timeline-labels">
+      <span *ngFor="let time of selectTimes" class="position-title">{{time.position}}</span>
+      <span class="position-title base-title">(Browser Local)</span>
+    </div>
+
+    <div class="timelines--container">
+      <app-atc-timeline *ngFor="let time of selectTimes" [times]="time.times" [position]="time.position" [selectedTimes]="selectedTimes[formatDateISO(currentDate)]" (selectTimesEvent)="this.selectedTimes[formatDateISO(currentDate)] = $event" [selectable]="true" [shifts]="shifts"></app-atc-timeline>
+
+      <ul class="timeline">
+        <li *ngFor="let time of timelineTimes">
+          <div class="status"></div>
+          <span>{{formatTime(time)}}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <label class="label--checkbox">
+    <input type="checkbox" class="checkbox" [checked]="hiddenCheckbox" (change)="hiddenCheckbox = !hiddenCheckbox">
+    <span>Hide my name and rating from non logged in users</span>
+  </label>
+
+  <span>(Event staff will still be able to view your name for planning purposes, if you wish for this data to be hidden also please email <a href="mailto:it@vatpac.org">it@vatpac.org</a>)</span>
+
+  <button class="save-times--btn" [disabled]="!timesAreSelected() || buttonDisabled" (click)="submitATC()">{{buttonTxt}}</button>
+</div>
+
+
+<div *ngIf="published == 2">
+  <app-airport-line *ngFor="let airport of airports" [airport]="airport" (airportFilter)="filterTimes($event)" [currentFilter]="currentFilter"></app-airport-line>
+
+  <div class="atc-timeline--container">
+    <div class="timeline-labels">
+      <span *ngFor="let time of filteredTimes" class="position-title">{{time.airport === 'CTR' ? time.position : time.airport + '_' + time.position}}</span>
+      <span class="position-title base-title">(Browser Local)</span>
+    </div>
+
+    <div class="timelines--container">
+      <app-atc-timeline *ngFor="let time of filteredTimes" [times]="time.times" [position]="time.position" [selectable]="false" [shifts]="shifts"></app-atc-timeline>
+
+      <ul class="timeline">
+        <li *ngFor="let time of timelineTimes">
+          <div class="status"></div>
+          <span>{{formatTime(time)}}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

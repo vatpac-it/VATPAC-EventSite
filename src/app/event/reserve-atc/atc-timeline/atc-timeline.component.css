@@ -72,12 +72,7 @@
   border: 1px solid #e03046;
 }
 
-.timeline li.complete .status {
-  border-top: 2px solid #66DC71;
-}
 .timeline li.complete .status:before {
-  background-color: #66DC71;
-  border: none;
   transition: all 200ms ease-in;
 }
 
@@ -91,6 +86,7 @@
 
 .timeline li.complete.dblue .status:before {
   background-color: #002CFF;
+  border: none;
 }
 
 .timeline li.complete.lblue {
@@ -103,6 +99,7 @@
 
 .timeline li.complete.lblue .status:before {
   background-color: #00BFC2;
+  border: none;
 }
 
 .timeline li.complete.orange {
@@ -115,6 +112,7 @@
 
 .timeline li.complete.orange .status:before {
   background-color: #FFAA00;
+  border: none;
 }
 
 .timeline li.complete.red {
@@ -127,6 +125,7 @@
 
 .timeline li.complete.red .status:before {
   background-color: #ff533c;
+  border: none;
 }
 
 .timeline li.complete.pink {
@@ -139,6 +138,7 @@
 
 .timeline li.complete.pink .status:before {
   background-color: #e002ff;
+  border: none;
 }
 
 .timeline li.complete.green {
@@ -151,4 +151,5 @@
 
 .timeline li.complete.green .status:before {
   background-color: #00a403;
+  border: none;
 }

@@ -1,0 +1,80 @@
+img {
+  margin: 40px auto 0;
+  display: block;
+}
+
+h1 {
+  text-align: center;
+  font-weight: lighter;
+  margin: 30px 0;
+}
+
+.event--container {
+  width: 75%;
+  padding: 30px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.event--container .event {
+  border-radius: 3px;
+  display: block;
+  margin: 20px;
+  min-width: 9rem;
+  min-height: 5rem;
+  background: white;
+  position: relative;
+  padding: 1rem;
+  color: black;
+  text-decoration: none;
+  transition: all 250ms;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.event--container .event.draft {
+  background-color: rgba(255, 63, 63, 0.15);
+}
+
+.event--container .event .draft--note {
+  position: absolute;
+  right: 1rem;
+  color: #808080;
+  text-transform: uppercase;
+}
+
+.event--container .event h4 {
+  font-size: 20px;
+  text-transform: capitalize;
+}
+
+.event--container .event p {
+  margin: 3px 0;
+  font-size: 18px;
+  text-transform: capitalize;
+}
+
+.event--container .event span {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.event--container .event:hover, .event--container .event:focus {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  -webkit-transform: translateY(-5px);
+  transform: translateY(-5px);
+}
+
+.event--container .event:active {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+}
+
+p.noEvents {
+  color: #818181;
+}

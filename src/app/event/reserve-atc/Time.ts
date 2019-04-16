@@ -3,4 +3,5 @@ export interface Time {
   end: number;
   name: string;
   rating: string;
+  available: boolean;
 }

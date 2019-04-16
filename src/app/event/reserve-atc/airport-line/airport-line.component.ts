@@ -17,7 +17,6 @@ export class AirportLineComponent implements OnInit {
   }
 
   setFilter(airport: string, position: string) {
-    console.log(this.currentFilter);
     this.airportFilter.emit({airport: airport, postion: position});
   }
 
