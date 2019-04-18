@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    eventService.getEvents().subscribe((data) => {
+    eventService.getMinEvents().subscribe((data) => {
       this.events = data.map((event) => {
         event.start = (typeof event.start === 'string' ? new Date(event.start) : event.start).toLocaleDateString('en-AU');
         return event;

@@ -135,36 +135,52 @@ export class ReserveATCComponent implements OnInit {
     this.outputTimes = [];
     this.timelineTimes = [];
 
-    const year = start.getFullYear();
-    const month = start.getMonth() + 1;
-    const day = start.getDate();
+    let sd = start.toLocaleDateString().split('/').reverse().join('-');
+    let st = this.getStartTime(start);
 
-    let date = year + '-' + (month.toString().length === 1 ? '0' + month : month) + '-' + (day.toString().length === 1 ? '0' + day : day);
-    date = date.substr(0, 10);
+    // console.log(start, this.times);
+
+    let tempOb: {[airport: string]: {[position: string]: Time[]}} = {};
 
     for (const airport in this.times) {
       if (this.times.hasOwnProperty(airport)) {
         const positions = this.times[airport];
         for (const position in positions) {
           if (positions.hasOwnProperty(position)) {
-            const times = positions[position][date];
 
-            const ordered = [];
+            let d = new Date(Date.UTC(start.getUTCFullYear(),
+              start.getUTCMonth(),
+              start.getUTCDate(), start.getUTCHours(), start.getUTCMinutes(),0));
+
             let emptys = [];
-            for (let s = this.getStartTime(start); s <= (this.getEndTime(start) - this.shifts); s += this.shifts) {
+            for (let s = st; s <= (this.getEndTime(start) - this.shifts); s += this.shifts) {
               const e = s + this.shifts;
 
               const o_s = this.getOutTime(s);
               const o_e = this.getOutTime(e);
 
-              const time = this.doTimesContain(times, o_s, o_e);
-              if (!ordered.includes(time)) {
-                ordered.push(time);
+              if (s !== st) {
+                d.setTime(d.getTime() + this.shifts * 60000);
               }
+
+              const dd = d.toLocaleDateString().split('/').reverse().join('-');
+
+              const time = this.doTimesContain(positions[position], dd, o_s, o_e);
+
+              if (!tempOb[airport]) {
+                tempOb[airport] = {};
+              }
+              if (!tempOb[airport][position]) {
+                tempOb[airport][position] = [];
+              }
+              if (!tempOb[airport][position].includes(time) && dd === sd) {
+                tempOb[airport][position].push(time);
+              }
+
               if (!this.timelineTimes.includes(o_s)) {
                 this.timelineTimes.push(o_s);
               }
-              emptys.push({start: o_s, end: o_e, name: null, rating: null, available: true});
+              emptys.push({start: o_s, end: o_e, user: null, available: true});
             }
             for (let position in this.selectTimes) {
               this.selectTimes[position].times = emptys;
@@ -172,7 +188,16 @@ export class ReserveATCComponent implements OnInit {
             if (!this.airports.includes(airport)) {
               this.airports.push(airport);
             }
-            this.outputTimes.push({airport: airport, position: position, times: ordered});
+          }
+        }
+      }
+    }
+
+    for (let airport in tempOb) {
+      if (tempOb.hasOwnProperty(airport)) {
+        for (let position in tempOb[airport]) {
+          if (tempOb[airport].hasOwnProperty(position)) {
+            this.outputTimes.push({airport: airport, position: position, times: tempOb[airport][position]});
           }
         }
       }
@@ -211,6 +236,7 @@ export class ReserveATCComponent implements OnInit {
     return minutes + (hours * 60);
   }
 
+  // Time in HHMM
   getOutTime(time: number) {
     const minutes = time % 60;
     const hours = Math.floor(time / 60);
@@ -218,21 +244,29 @@ export class ReserveATCComponent implements OnInit {
     return (hours * 100) + minutes;
   }
 
-  doTimesContain(times: Array<Time> , start: number, end: number) : Time {
-    if (typeof times === 'undefined') { times = []; }
-    for (const time of times) {
-      const starts = time.start.toString().split(':');
-      const ends = time.end.toString().split(':');
+  doTimesContain(times: {[date: string]: Array<Time>}, d: string, start: number, end: number) : Time {
+    if (typeof times === 'undefined') { times = {}; }
+    for (const date in times) {
+      if (times.hasOwnProperty(date)) {
+        for (let time of times[date]) {
+          const starts = time.start.toString().split(':');
+          const ends = time.end.toString().split(':');
 
-      const s = this.getNumTime(new Date(Date.UTC(0, 0, 0, parseInt(starts[0]), parseInt(starts[1]), parseInt(starts[2]))));
-      const e = this.getNumTime(new Date(Date.UTC(0, 0, 0, parseInt(ends[0]), parseInt(ends[1]), parseInt(ends[2]))));
+          const s = this.getNumTime(new Date(Date.UTC(parseInt(d.substr(0, 4)),
+            parseInt(d.substr(5, 2))-1,
+            parseInt(d.substr(8, 2)), parseInt(starts[0]), parseInt(starts[1]), parseInt(starts[2]))));
+          const e = this.getNumTime(new Date(Date.UTC(parseInt(d.substr(0, 4)),
+            parseInt(d.substr(5, 2))-1,
+            parseInt(d.substr(8, 2)), parseInt(ends[0]), parseInt(ends[1]), parseInt(ends[2]))));
 
-      time.start = isNaN(s) ? parseInt(starts[0]) : this.getOutTime(s);
-      time.end = isNaN(e) ? parseInt(ends[0]) : this.getOutTime(e);
+          time.start = isNaN(s) ? parseInt(starts[0]) : this.getOutTime(s);
+          time.end = isNaN(e) ? parseInt(ends[0]) : this.getOutTime(e);
 
-      if (end > time.start && end <= time.end)  {
-        time.available = false;
-        return time;
+          if (end > time.start && end <= time.end)  {
+            time.available = false;
+            return time;
+          }
+        }
       }
     }
 
@@ -246,11 +280,11 @@ export class ReserveATCComponent implements OnInit {
     if (filter.airport === '' && filter.postion === '') { return; }
 
     if (filter.airport === '' && filter.postion !== '') {
-      this.filteredTimes = this.outputTimes.filter(time => time.position === filter.postion);
+      this.filteredTimes = this.outputTimes.filter(time => time.position.slice(-3) === filter.postion);
     } else if (filter.airport !== '' && filter.postion === '') {
       this.filteredTimes = this.outputTimes.filter(time => time.airport === filter.airport);
     } else {
-      this.filteredTimes = this.outputTimes.filter(time => time.airport === filter.airport && time.position === filter.postion);
+      this.filteredTimes = this.outputTimes.filter(time => time.airport === filter.airport && time.position.slice(-3) === filter.postion);
     }
   }
 

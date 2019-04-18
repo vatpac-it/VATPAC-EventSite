@@ -16,6 +16,10 @@ export class EventService {
     return <Observable<Event[]>> this.http.get<Event[]>(`${url}/events`, { withCredentials: true });
   }
 
+  public getMinEvents(): Observable<Event[]> {
+    return <Observable<Event[]>> this.http.get<Event[]>(`${url}/events/min`, { withCredentials: true });
+  }
+
   public getEvent(event_sku): Observable<Event> {
     return <Observable<Event>> this.http.get<Event>(`${url}/events/${event_sku}`, { withCredentials: true });
   }

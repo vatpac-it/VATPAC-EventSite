@@ -29,7 +29,7 @@ export class AtcTimelineComponent implements OnInit {
   }
 
   ngOnInit() {
-    switch (this.position) {
+    switch (this.position.slice(-3)) {
       case 'DEL':
         this.colorClass = 'dblue';
         break;
