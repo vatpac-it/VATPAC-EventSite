@@ -18,7 +18,7 @@
 
 .timeline li .title {
   margin-bottom: 20px;
-  padding: 0 40px;
+  padding: 0 5%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,7 +28,7 @@
 
 .timeline li .status {
   padding: 0 40px;
-  width: 160px;
+  width: 100%;
   display: flex;
   justify-content: center;
   border-top: 2px solid #D6DCE0;

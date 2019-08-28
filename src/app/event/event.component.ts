@@ -3,6 +3,8 @@ import {Event} from '../models/Event';
 import {EventService} from '../services/event.service';
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {Title} from "@angular/platform-browser";
+import {CoreResponse} from "../models/CoreResponse";
+import {AlertService} from "../services/alert.service";
 
 @Component({
   selector: 'app-event',
@@ -11,27 +13,41 @@ import {Title} from "@angular/platform-browser";
 })
 export class EventComponent implements OnInit {
 
-  data: Event;
+  event: Event;
 
-  constructor(private eventService: EventService, private titleService: Title, private activeRoute: ActivatedRoute, private router: Router) {
+  constructor(private eventService: EventService, private alertService: AlertService, private titleService: Title, private activeRoute: ActivatedRoute, private router: Router) {
     const event_sku = this.activeRoute.snapshot.paramMap.get('sku');
 
-    this.eventService.getEvent(event_sku).subscribe((event) => {
-      if (event === null) {
-        window.location.pathname = '';
+    this.eventService.getEvent(event_sku).subscribe((res) => {
+      res = new CoreResponse(res);
+      if (!res.success()) {
+        this.alertService.add('bg-danger', 'Error getting Event.');
+        return router.navigate(['/']);
       }
-      this.data = event;
+
+      let event = res.body.event as Event;
+
+      this.event = event;
 
       this.titleService.setTitle(event.title + ' | VATPAC Events');
 
-      for (let i in this.data.sections) {
-        this.data.sections[i].content = this.data.sections[i].content.replace(/\n/g, '<br />');
-      }
-      let start = this.data.start.toString();
-      this.data.start = new Date(this.data.start.toString());
-      this.data.end = new Date(this.data.end.toString());
+      this.event.sections = this.event.sections.map(s => { s.content.replace(/\n/g, '<br />'); return s });
+
+      this.event.start = new Date(this.event.start.toString());
+      this.event.end = new Date(this.event.end.toString());
+
+      this.event.airports = this.event.airports.sort((a, b) => (a.kind === 'departing') ? -1 : (b.kind === 'departing' ? 1 : (a.kind === 'arriving' ? 1 : (b.kind === 'arriving' ? -1 : 0))))
+
+      const sel = [];
+      this.event.selected.forEach(s => {
+        s.positions.forEach(p => {
+          sel.push({date: s.date, position: p, private: s.private});
+        })
+      });
+      this.event.selected = sel;
     }, (err) => {
-      this.router.navigateByUrl('');
+      this.alertService.add('bg-danger', 'Error getting Event.');
+      return this.router.navigate(['/']);
     });
   }
 
@@ -65,7 +81,11 @@ export class EventComponent implements OnInit {
   formatTime(date: Date) {
     const time = date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false});
 
-    return time + ' (Browser Local)';
+    return time + ' <small class="text-muted">(' + Intl.DateTimeFormat().resolvedOptions().timeZone + ')</small>';
+  }
+
+  capitalize(s) {
+    return s.replace(/\b./g, function(m){ return m.toUpperCase(); });
   }
 
 }

@@ -1,8 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Time} from './Time';
+import {SelectedTimes, Time} from './Time';
 import {EventService} from '../../services/event.service';
 import {ActivatedRoute} from '@angular/router';
 import {UserService} from '../../services/user.service';
+import {CoreResponse} from "../../models/CoreResponse";
+import {AlertService} from "../../services/alert.service";
 
 @Component({
   selector: 'app-reserve-atc',
@@ -10,24 +12,18 @@ import {UserService} from '../../services/user.service';
   styleUrls: ['./reserve-atc.component.css']
 })
 export class ReserveATCComponent implements OnInit {
-  @Input() readonly times: {
-    [airport: string]: {
-      [position: string]: {
-        [date: string]: Array<Time>
-      }
-    }
-  };
+  @Input() readonly positions: { user: { _id: string, cid: string, first_name: string, last_name: string, atc_rating: string }, airport: { _id: string, icao: string }, position: string, date: Date, hidden: boolean }[];
+  @Input() readonly available: string[];
 
   @Input() readonly shifts: number;
   @Input() readonly start: Date;
   @Input() readonly end: Date;
 
-  @Input() readonly event_id: number;
   @Input() readonly published: number;
 
-  public dates: Date[];
-  public airports: Array<String>;
-  public timelineTimes: Array<number>;
+  public dates: Date[] = [];
+  public airports: Array<String> = [''];
+  public timelineTimes: Array<number> = [];
 
   hiddenCheckbox = false;
 
@@ -36,85 +32,37 @@ export class ReserveATCComponent implements OnInit {
 
   currentFilter = {airport: '', postion: ''};
   currentDate: Date;
+  timesChanged = false;
 
-  @Input() public selectedTimes: {
-    [date: string]: {
-      [position: string]: Array<number>
-    }
-  } = {};
-  selectedDefault = false;
+  @Input() public selectedTimes: SelectedTimes[] = [];
 
-  private outputTimes: {
-    airport: string,
-    position: string,
-    times: Array<Time>
-  }[];
+  public filteredTimes: { airport: string, position: string, times: Array<Time> }[] = [];
 
-  public filteredTimes: {
-    airport: string,
-    position: string,
-    times: Array<Time>
-  }[];
+  public times: { airport: string, position: string, times: Array<Time> }[] = [];
 
-  public selectTimes: {position: string, times: Array<Time>}[] = [
-    {position: 'DEL', times: []},
-    {position: 'GND', times: []},
-    {position: 'TWR', times: []},
-    {position: 'APP', times: []},
-    {position: 'CTR', times: []}
-  ];
+  constructor(private eventService: EventService, private userService: UserService, private activeRoute: ActivatedRoute, private alertService: AlertService) {
+  }
 
-  constructor(private eventService: EventService, private userService: UserService, private activeRoute: ActivatedRoute) {
-    this.outputTimes = [];
-    this.airports = [''];
-    this.timelineTimes = [];
+  get disabled() {
+    return window.innerWidth < 700
   }
 
   ngOnInit() {
-
-    let outTimes: {
-      [date: string]: {
-        [position: string]: Array<number>
-      }
-    } = {};
-
-    for (let date in this.selectedTimes) {
-      if (this.selectedTimes.hasOwnProperty(date)) {
-        let outDate = date;
-        for (let position in this.selectedTimes[date]) {
-          if (this.selectedTimes[date].hasOwnProperty(position)) {
-            let t = this.selectedTimes[date][position];
-            for (let tt in t) {
-              if (t.hasOwnProperty(tt)) {
-                let time = t[tt];
-                const ts = time.toString().split(':');
-                let d = new Date(Date.UTC(parseInt(date.substr(0, 4)),
-                  parseInt(date.substr(5, 2))-1,
-                  parseInt(date.substr(8, 2)),
-                  parseInt(ts[0]), parseInt(ts[1]), parseInt(ts[2])));
-
-                outDate = d.toLocaleDateString().split('/').reverse().join('-');
-
-                if (!outTimes[outDate]) {
-                  outTimes[outDate] = {};
-                }
-                if (!outTimes[outDate][position]) {
-                  outTimes[outDate][position] = [];
-                }
-
-                outTimes[outDate][position].push(this.getOutTime(this.getNumTime(d)));
-              }
-            }
-          }
-        }
-      }
+    let currentDate = this.start;
+    while (currentDate <= this.end) {
+      if (!(currentDate.isSameDateAs(this.end) && (currentDate.getHours() > this.end.getHours() || (currentDate.getHours() == this.end.getHours() && currentDate.getMinutes() >= this.end.getMinutes())))) this.dates.push(new Date(currentDate));
+      currentDate = ReserveATCComponent.addDays(currentDate, 1);
     }
 
-    this.selectedTimes = outTimes;
-
-    this.dates = this.getDates(this.start, this.end);
-
-    this.selectedDefault = this.timesAreSelected();
+    for (let position of this.available) {
+      let el = position.split('_');
+      if (this.times.findIndex(e => e.position === el[1] && e.airport === el[0]) === -1) {
+        this.times.push({airport: el[0], position: el[1], times: []});
+      }
+      if (this.airports.indexOf(el[0]) === -1) {
+        this.airports.push(el[0]);
+      }
+    }
 
     this.setTimesForDay(this.start);
 
@@ -132,78 +80,79 @@ export class ReserveATCComponent implements OnInit {
 
   setTimesForDay(start: Date) {
     this.currentDate = start;
-    this.outputTimes = [];
     this.timelineTimes = [];
 
-    let sd = start.toLocaleDateString().split('/').reverse().join('-');
-    let st = this.getStartTime(start);
+    let empties = [];
+    for (let s = this.getStartTime(start); s <= (this.getEndTime(start) - this.shifts); s += this.shifts) {
+      const e = s + this.shifts;
 
-    // console.log(start, this.times);
+      const o_s = this.getOutTime(s);
+      const o_e = this.getOutTime(e);
 
-    let tempOb: {[airport: string]: {[position: string]: Time[]}} = {};
+      if (!this.timelineTimes.includes(o_s)) this.timelineTimes.push(o_s);
 
-    for (const airport in this.times) {
-      if (this.times.hasOwnProperty(airport)) {
-        const positions = this.times[airport];
-        for (const position in positions) {
-          if (positions.hasOwnProperty(position)) {
+      empties.push(<Time>{start: o_s, end: o_e, user: null, available: true});
+    }
 
-            let d = new Date(Date.UTC(start.getUTCFullYear(),
-              start.getUTCMonth(),
-              start.getUTCDate(), start.getUTCHours(), start.getUTCMinutes(),0));
+    for (let position in this.times) {
+      this.times[position].times = empties.slice();
+    }
 
-            let emptys = [];
-            for (let s = st; s <= (this.getEndTime(start) - this.shifts); s += this.shifts) {
-              const e = s + this.shifts;
-
+    if (this.published === 2) {
+      for (let position of this.positions) {
+        const d = new Date(position.date);
+        if (d.isSameDateAs(start)) {
+          for (let time of this.times) {
+            if (time.airport === position.airport.icao && time.position === position.position) {
+              const s = this.getNumTime(d);
               const o_s = this.getOutTime(s);
-              const o_e = this.getOutTime(e);
+              const o_e = this.getOutTime(s + this.shifts);
 
-              if (s !== st) {
-                d.setTime(d.getTime() + this.shifts * 60000);
-              }
-
-              const dd = d.toLocaleDateString().split('/').reverse().join('-');
-
-              const time = this.doTimesContain(positions[position], dd, o_s, o_e);
-
-              if (!tempOb[airport]) {
-                tempOb[airport] = {};
-              }
-              if (!tempOb[airport][position]) {
-                tempOb[airport][position] = [];
-              }
-              if (!tempOb[airport][position].includes(time) && dd === sd) {
-                tempOb[airport][position].push(time);
-              }
-
-              if (!this.timelineTimes.includes(o_s)) {
-                this.timelineTimes.push(o_s);
-              }
-              emptys.push({start: o_s, end: o_e, user: null, available: true});
-            }
-            for (let position in this.selectTimes) {
-              this.selectTimes[position].times = emptys;
-            }
-            if (!this.airports.includes(airport)) {
-              this.airports.push(airport);
+              const i = time.times.findIndex(t => t.start === o_s && t.end === o_e);
+              time.times[i] = <Time>{
+                start: o_s,
+                end: o_e,
+                user: position.user.cid,
+                name: position.user.first_name + (position.user.last_name.length > 0 ? ' ' + position.user.last_name : ''),
+                rating: position.user.atc_rating,
+                available: false
+              };
             }
           }
         }
       }
-    }
+      this.filteredTimes = this.times;
 
-    for (let airport in tempOb) {
-      if (tempOb.hasOwnProperty(airport)) {
-        for (let position in tempOb[airport]) {
-          if (tempOb[airport].hasOwnProperty(position)) {
-            this.outputTimes.push({airport: airport, position: position, times: tempOb[airport][position]});
-          }
-        }
-      }
+      this.filterTimes(this.currentFilter);
     }
+  }
 
-    this.filteredTimes = this.outputTimes;
+  hasPositions(airport: string) {
+    let p = (airport === '') ? this.times : this.times.filter(t => t.airport === airport);
+    return Array.from(new Set(p.map(t => t.position)));
+  }
+
+  getSelectedTimesForDate(position: string): number[] {
+    return [].concat.apply([], this.selectedTimes.filter(time => {
+      if (!(time.date instanceof Date)) time.date = new Date(time.date);
+      return time.date.isSameDateAs(this.currentDate) && time.position === position
+    }).map(time => this.getOutTime(this.getNumTime(time.date))));
+  }
+
+  saveSelectedTimes(position: string, times: number[]) {
+    this.timesChanged = true;
+    this.selectedTimes = this.selectedTimes.filter(time => {
+      if (!(time.date instanceof Date)) time.date = new Date(time.date);
+      return !(time.date.isSameDateAs(this.currentDate) && time.position === position)
+    });
+    for (let time of times) {
+      const d = new Date(this.currentDate);
+      const minutes = time % 100;
+      const hours = Math.floor(time / 100);
+      d.setHours(hours, minutes, 0, 0);
+
+      this.selectedTimes.push({date: d, position: position});
+    }
   }
 
   getEndTime(date: Date) {
@@ -214,24 +163,19 @@ export class ReserveATCComponent implements OnInit {
     }
   }
 
+  // Gets the start time of a day
   getStartTime(date: Date) {
-    if (date === this.start) {
+    if (date.isSameDateAs(this.start)) {
       return this.getNumTime(date);
     } else {
       return 0;
     }
   }
 
+  // Gets Date time in minutes
   getNumTime(date: Date) {
     const minutes = date.getMinutes();
     const hours = date.getHours();
-
-    return minutes + (hours * 60);
-  }
-
-  getUTCNumTime(date: Date) {
-    const minutes = date.getUTCMinutes();
-    const hours = date.getUTCHours();
 
     return minutes + (hours * 60);
   }
@@ -244,51 +188,22 @@ export class ReserveATCComponent implements OnInit {
     return (hours * 100) + minutes;
   }
 
-  doTimesContain(times: {[date: string]: Array<Time>}, d: string, start: number, end: number) : Time {
-    if (typeof times === 'undefined') { times = {}; }
-    for (const date in times) {
-      if (times.hasOwnProperty(date)) {
-        for (let time of times[date]) {
-          const starts = time.start.toString().split(':');
-          const ends = time.end.toString().split(':');
-
-          const s = this.getNumTime(new Date(Date.UTC(parseInt(d.substr(0, 4)),
-            parseInt(d.substr(5, 2))-1,
-            parseInt(d.substr(8, 2)), parseInt(starts[0]), parseInt(starts[1]), parseInt(starts[2]))));
-          const e = this.getNumTime(new Date(Date.UTC(parseInt(d.substr(0, 4)),
-            parseInt(d.substr(5, 2))-1,
-            parseInt(d.substr(8, 2)), parseInt(ends[0]), parseInt(ends[1]), parseInt(ends[2]))));
-
-          time.start = isNaN(s) ? parseInt(starts[0]) : this.getOutTime(s);
-          time.end = isNaN(e) ? parseInt(ends[0]) : this.getOutTime(e);
-
-          if (end > time.start && end <= time.end)  {
-            time.available = false;
-            return time;
-          }
-        }
-      }
-    }
-
-    return {start: start, end: end, name: null, rating: null, available: true};
-  }
-
-  filterTimes(filter: {airport: string, postion: string}) {
-    this.filteredTimes = this.outputTimes;
+  filterTimes(filter: { airport: string, postion: string }) {
+    this.filteredTimes = this.times;
     this.currentFilter = filter;
 
-    if (filter.airport === '' && filter.postion === '') { return; }
+    if (filter.airport === '' && filter.postion === '') return;
 
     if (filter.airport === '' && filter.postion !== '') {
-      this.filteredTimes = this.outputTimes.filter(time => time.position.slice(-3) === filter.postion);
+      this.filteredTimes = this.times.filter(time => time.position.slice(-3) === filter.postion);
     } else if (filter.airport !== '' && filter.postion === '') {
-      this.filteredTimes = this.outputTimes.filter(time => time.airport === filter.airport);
+      this.filteredTimes = this.times.filter(time => time.airport === filter.airport);
     } else {
-      this.filteredTimes = this.outputTimes.filter(time => time.airport === filter.airport && time.position.slice(-3) === filter.postion);
+      this.filteredTimes = this.times.filter(time => time.airport === filter.airport && time.position.slice(-3) === filter.postion);
     }
   }
 
-  formatTime(time: number) : string {
+  formatTime(time: number): string {
     let ret_t = time.toString();
     while (ret_t.length < 4) {
       ret_t = '0' + ret_t;
@@ -296,107 +211,42 @@ export class ReserveATCComponent implements OnInit {
     return ret_t;
   }
 
-  formatDate(date: string) {
+  formatDate(date: string | Date) {
     const dDate = new Date(date);
     let day = '' + dDate.getDate(),
       month = '' + (dDate.getMonth() + 1);
     const year = dDate.getFullYear();
-    if (day.length < 2) { day = '0' + day; }
-    if (month.length < 2) { month = '0' + month; }
+    if (day.length < 2) {
+      day = '0' + day;
+    }
+    if (month.length < 2) {
+      month = '0' + month;
+    }
 
     return [day, month, year].join('/');
   }
 
-  formatDateISO(date: string) {
-    const dDate = new Date(date);
-
-    const year = dDate.getFullYear();
-    const month = dDate.getMonth() + 1;
-    const day = dDate.getDate();
-
-    return year + '-' + (month.toString().length === 1 ? '0' + month : month) + '-' + (day.toString().length === 1 ? '0' + day : day).toString().substr(0, 10);
-  }
-
-  getDates(startDate, stopDate) : Date[] {
-    const dateArray = [];
-    let currentDate = startDate;
-    while (currentDate <= stopDate) {
-      const formattedDate = this.formatDateISO(currentDate);
-      if (!(formattedDate in this.selectedTimes)) {
-        this.selectedTimes[formattedDate] = {};
-      }
-
-      dateArray.push(currentDate);
-      currentDate = this.addDays(currentDate, 1);
-    }
-    return dateArray;
-  }
-
-  addDays(date, days) {
+  static addDays(date, days) {
     const dat = new Date(date);
     dat.setDate(dat.getDate() + days);
     return dat;
   }
 
-  timesAreSelected() {
-    for (const date in this.selectedTimes) {
-      if (Object.keys(this.selectedTimes[date]).length > 0) {
-        return true;
-      }
-    }
-    return this.selectedDefault;
-  }
-
   submitATC() {
-    if (this.timesAreSelected()) {
-      let outTimes: {
-          [date: string]: {
-            [position: string]: Array<string>
-        }
-      } = {};
-
-      for (let date in this.selectedTimes) {
-        if (this.selectedTimes.hasOwnProperty(date)) {
-          let outDate = date;
-          for (let position in this.selectedTimes[date]) {
-            if (this.selectedTimes[date].hasOwnProperty(position)) {
-              let t = this.selectedTimes[date][position];
-              for (let tt in t) {
-                if (t.hasOwnProperty(tt)) {
-                  let time = t[tt];
-                  let d = new Date(parseInt(date.substr(0, 4)),
-                    parseInt(date.substr(5, 2))-1,
-                    parseInt(date.substr(8, 2)), parseInt(this.formatTime(time).substr(0, 2)), parseInt(this.formatTime(time).substr(2, 2)));
-
-                  outDate = d.toISOString().substr(0, 10);
-
-                  if (!outTimes[outDate]) {
-                    outTimes[outDate] = {};
-                  }
-                  if (!outTimes[outDate][position]) {
-                    outTimes[outDate][position] = [];
-                  }
-
-                  outTimes[outDate][position].push(d.toISOString().substr(11, 8));
-                }
-              }
-            }
-          }
-        }
-      }
-
-      this.eventService.submitATC(this.activeRoute.snapshot.paramMap.get('sku'), this.event_id, outTimes, this.hiddenCheckbox ? 1 : 0).subscribe((data) => {
-        if (data['request'] && data['request']['code'] === 403) {
-          window.location.reload(false);
+    if (this.timesChanged) {
+      console.log(this.selectedTimes);
+      this.eventService.submitATC(this.activeRoute.snapshot.paramMap.get('sku'), this.selectedTimes, this.hiddenCheckbox ? 1 : 0).subscribe((res) => {
+        res = new CoreResponse(res);
+        if (!res.success()) {
+          this.alertService.add('bg-danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
         }
 
-        if (typeof data['request'] !== 'undefined' && data['request']['result'] === 'success') {
-          this.buttonDisabled = true;
-          this.buttonTxt = 'Application Submitted';
-        }
+        this.buttonDisabled = true;
+        this.buttonTxt = 'Application Submitted';
+      }, error => {
+        this.alertService.add('bg-danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
       });
     }
   }
-
 
 }

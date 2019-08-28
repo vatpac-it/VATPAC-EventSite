@@ -1,21 +1,31 @@
-<nav class="navbar" [class.scrolled]="scrolled">
-  <a routerLink="" class="navbar--brand">
+<nav class="navbar fixed-top navbar-expand-lg {{scrolled ? 'navbar-light' : 'navbar-dark'}}" [class.scrolled]="scrolled">
+  <a routerLink="" class="navbar-brand">
     <img src="../../../assets/img/vatpac-logo.png" alt="">
   </a>
 
-  <a href="javascript:void();" id="menu-icon" (click)="menuIconClick()"></a>
-
-  <ul class="navbar--items">
-    <li class="navbar--item"><a class="link--item" [ngx-scroll-to]="'aboutAnchor'">About</a></li>
-    <li class="navbar--item"><a class="link--item" [ngx-scroll-to]="'infoAnchor'">Info</a></li>
-    <li class="navbar--item"><a class="link--item" [ngx-scroll-to]="'atcAnchor'">ATC</a></li>
-    <div *ngIf="loggedIn(); then loggedInT else loggedOutT"></div>
-    <ng-template #loggedOutT>
-      <li class="navbar--item"><a class="link--item" (click)="login()">Login</a></li>
-    </ng-template>
-    <ng-template #loggedInT>
-      <li class="navbar--item" *ngIf="name"><a class="link--item">{{name}}</a></li>
-      <li class="navbar--item"><a class="link--item text-s-red" (click)="logout()">Logout</a></li>
-    </ng-template>
-  </ul>
+  <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" [attr.aria-expanded]="navToggled" aria-label="Toggle navigation" (click)="toggleNavbar()">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="navbar-collapse collapse" id="navbarSupportedContent" [ngbCollapse]="!navToggled" [@collapse]="isNavbarCollapsedAnim">
+    <ul class="navbar-nav flex-sm-column flex-md-row ml-auto mt-sm-3 mt-md-0 text-center">
+      <li class="nav-item"><button class="btn btn-link nav-link w-100" [ngx-scroll-to]="'aboutAnchor'" [ngx-scroll-to-offset]="-160">About</button></li>
+      <li class="nav-item"><button class="btn btn-link nav-link w-100" [ngx-scroll-to]="'infoAnchor'" [ngx-scroll-to-offset]="-160">Info</button></li>
+      <li class="nav-item"><button class="btn btn-link nav-link w-100" [ngx-scroll-to]="'atcAnchor'" [ngx-scroll-to-offset]="-160">ATC</button></li>
+      <div *ngIf="loggedIn(); then loggedInT else loggedOutT"></div>
+      <ng-template #loggedOutT>
+        <li class="nav-item"><button class="btn btn-link nav-link w-100" (click)="login()">Login</button></li>
+      </ng-template>
+      <ng-template #loggedInT>
+        <li class="nav-item" *ngIf="name"><button class="btn btn-link nav-link w-100" [autoClose]="true" popoverTitle="Are you sure you want to open your profile?" [ngbPopover]="confirmProfile">{{name}}</button></li>
+        <li class="nav-item"><button class="btn btn-link nav-link w-100 text-danger" (click)="logout()">Logout</button></li>
+      </ng-template>
+    </ul>
+  </div>
 </nav>
+
+<ng-template #confirmProfile>
+  <p>This will open a new tab to your profile.</p>
+  <div class="row justify-content-center">
+    <a class="btn btn-primary" target="_blank" href="https://profile.vatpac.org">Yes, I'm sure</a>
+  </div>
+</ng-template>

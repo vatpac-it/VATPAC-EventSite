@@ -1,51 +1,50 @@
-<div *ngIf="data">
-  <div class="header--hero">
-    <app-topnav></app-topnav>
+<div *ngIf="event" class="overflow-hidden">
+  <app-topnav></app-topnav>
 
-    <div class="header--container">
-      <div class="bg-img"></div>
+  <div class="header--hero jumbotron jumbotron-fluid d-flex align-items-end">
+    <div class="container my-4">
 
-      <div class="content--wrapper">
-        <h1 class="event-name">{{data.title}}</h1>
-        <h2 class="primary-location">{{data.subTitle}}</h2>
-      </div>
+      <h1 class="display-2 text-white">{{event.title}}</h1>
+      <h2 class="text-info pl-2 mt-n2">{{event.subtitle}}</h2>
     </div>
   </div>
 
-  <div id="aboutAnchor" class="about-info--container">
-    <div class="about-info--row">
-
-      <div *ngFor="let airport of data.airports; let i = index" >
-        <app-about *ngIf="data.airports.length === 2 && i === 0" [item]="{title: 'Departing', icon: 'departure-icon.png', line1: airport.icao, line2: '('+airport.icao+')', reverselines: false, centerlines: true}"></app-about>
-        <app-about *ngIf="data.airports.length === 2 && i === 1" [item]="{title: 'Arriving', icon: 'departure-icon.png', line1: airport.icao, line2: '('+airport.icao+')', reverselines: false, centerlines: true}"></app-about>
-        <app-about *ngIf="data.airports.length !== 2" [item]="{title: '', icon: 'departure-icon.png', line1: airport.icao, line2: '('+airport.icao+')', reverselines: false, centerlines: true}"></app-about>
-
-      </div>
+  <div id="aboutAnchor" class="container mx-3 mx-sm-auto">
+    <div class="row justify-content-around">
+      <app-about [title]="'Start'" [line1]="formatDate(event.start)" [line2]="formatTime(event.start)" [icon]="'clock'"></app-about>
+      <app-about [title]="'End'" [line1]="formatDate(event.end)" [line2]="formatTime(event.end)" [icon]="'clock'"></app-about>
     </div>
 
-    <div class="divider horizontal spaced"></div>
+    <app-countdown [date]="event.start"></app-countdown>
 
-    <div class="about-info--row">
-      <app-about [item]="{title: 'Starting', icon: 'pilot-icon.png', line1: formatDate(data.start), line2: formatTime(data.start), reverselines: true, centerlines: false}"></app-about>
+    <hr class="my-5">
 
-      <app-about [item]="{title: 'Ending', icon: 'pilot-icon.png', line1: formatDate(data.end), line2: formatTime(data.end), reverselines: true, centerlines: false}"></app-about>
+    <div class="row justify-content-around">
+      <h1 class="w-100 m-0">Where</h1>
+      <app-about *ngFor="let airport of event.airports" [line1]="airport.airport.icao" [line2]="capitalize(airport.kind)" [icon]="airport.kind === 'departing' ? 'plane-departure' : (airport.kind === 'arriving' ? 'plane-arrival' : 'plane')"></app-about>
     </div>
+
   </div>
 
-  <div id="infoAnchor">
-    <div class="sections--container" *ngFor="let section of data.sections">
-      <h2 class="section--title">{{section.title}}</h2>
+  <section id="infoAnchor">
+    <h1 class="display-4 text-center">Event Info</h1>
 
-      <p class="section--text" [innerHTML]="section.content"></p>
-      <!--<app-pilot-info [data]="data"></app-pilot-info>-->
+    <div class="container pt-3 pt-md-5 pb-4 px-3 px-md-5" *ngFor="let section of event.sections">
+      <h1 class="mb-4">{{section.title}}</h1>
+
+      <p [innerHTML]="section.content"></p>
+      <!--<app-pilot-info [event]="event"></app-pilot-info>-->
     </div>
-  </div>
+  </section>
 
-  <div id="atcAnchor" class="reserveATC--container">
-    <h2 class="section--title">Reserve ATC</h2>
+  <section id="atcAnchor" *ngIf="event.published > 0">
+    <h1 class="display-4 text-center">Reserve ATC</h1>
 
-    <app-reserve-atc [times]="data.positions" [shifts]="data.shiftLength" [start]="data.start" [end]="data.end" [selectedTimes]="data.selected || {}" [event_id]="data.id" [published]="data.published"></app-reserve-atc>
-  </div>
+    <div class="container-fluid mt-4">
+      <app-reserve-atc [positions]="event.positions" [available]="event.available" [shifts]="event.shiftLength" [start]="event.start" [end]="event.end" [selectedTimes]="event.selected || []"
+                       [published]="event.published"></app-reserve-atc>
+    </div>
+  </section>
 
   <div class="footer">
     <p>&#169; VATPAC 2019</p>

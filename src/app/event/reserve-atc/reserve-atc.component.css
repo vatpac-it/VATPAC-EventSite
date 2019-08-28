@@ -60,7 +60,7 @@
 
 .timeline li .status {
   padding: 0 40px;
-  width: 160px;
+  width: 190px;
   display: flex;
   justify-content: center;
   border-top: 2px solid rgb(57, 138, 246);
@@ -85,111 +85,6 @@
   left: -18px;
   bottom: -35px;
   color: #7f7f7f;
-}
-
-
-
-
-.label--checkbox {
-  position: relative;
-  max-width: 300px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: .5rem auto;
-  line-height: 135%;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.label--checkbox + span {
-  color: #aaa;
-  font-size: 12px;
-  margin: 15px auto;
-  display: block;
-  max-width: 300px;
-}
-
-.checkbox {
-  position: relative;
-  top: -0.375rem;
-  margin: 0 1rem 0 0;
-  cursor: pointer;
-}
-.checkbox:before {
-  -webkit-transition: all 0.3s ease-in-out;
-  -moz-transition: all 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
-  content: "";
-  position: absolute;
-  left: 0;
-  z-index: 1;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #f2f2f2;
-}
-.checkbox:checked:before {
-  -webkit-transform: rotate(-45deg);
-  -moz-transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
-  -o-transform: rotate(-45deg);
-  transform: rotate(-45deg);
-  height: .5rem;
-  border-color: #009688;
-  border-top-style: none;
-  border-right-style: none;
-}
-.checkbox:after {
-  content: "";
-  position: absolute;
-  top: -0.125rem;
-  left: 0;
-  width: 1.1rem;
-  height: 1.1rem;
-  background: #fff;
-  cursor: pointer;
-}
-
-.save-times--btn {
-  width: 300px;
-  margin: 30px auto;
-  display: block;
-  border-radius: 5px;
-  padding: 15px 25px;
-  font-size: 22px;
-  text-decoration: none;
-  cursor: pointer;
-  border: none;
-  color: #fff;
-  background-color: #55acee;
-  box-shadow: 0 5px 0 0 #3C93D5;
-  position: relative;
-  outline: none;
-}
-
-.save-times--btn:disabled {
-  cursor: default;
-  background-color: #b9bebe;
-  box-shadow: 0 5px 0 0 #8d9191;
-}
-
-.save-times--btn:not(:disabled):hover {
-  background-color: #6FC6FF;
-}
-
-.save-times--btn:active {
-  transform: translate(0px, 5px);
-  -webkit-transform: translate(0px, 5px);
-  box-shadow: 0 1px 0 0;
-}
-
-.disclaimer {
-  color: #757575;
-  font-size: 14px;
-  margin: 15px auto;
-  display: block;
-  max-width: 90%;
-  text-align: center;
 }
 
 @media (min-device-width: 320px) and (max-device-width: 700px) {

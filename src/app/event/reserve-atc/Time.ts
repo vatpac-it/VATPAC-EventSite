@@ -6,3 +6,8 @@ export interface Time {
   rating: string;
   available: boolean;
 }
+
+export interface SelectedTimes {
+  date: Date;
+  position: string;
+}

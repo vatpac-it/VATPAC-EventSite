@@ -1,6 +1,12 @@
 table {
-  margin: 20px auto;
-  border-spacing: 5px;
+  margin: 5px auto;
+  border-spacing: 10px;
+  border-collapse: separate;
+}
+table.divided {
+  padding: 0 30px;
+  margin-bottom: 10px;
+  border-bottom: #d2d2d2 1px solid;
 }
 tr {
   height: 30px;
@@ -10,6 +16,7 @@ td {
   font-weight: lighter;
   border-radius: 7px;
   padding: 3px 10px;
+  margin: 0 10px;
   background: none;
   cursor: pointer;
 }
@@ -25,7 +32,7 @@ td.selected {
 
 .airport-title {
   width: 70px;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
   border-radius: 7px;
   padding: 3px 10px;
