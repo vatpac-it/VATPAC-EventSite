@@ -238,13 +238,13 @@ export class ReserveATCComponent implements OnInit {
       this.eventService.submitATC(this.activeRoute.snapshot.paramMap.get('sku'), this.selectedTimes, this.hiddenCheckbox ? 1 : 0).subscribe((res) => {
         res = new CoreResponse(res);
         if (!res.success()) {
-          this.alertService.add('bg-danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
+          this.alertService.add('danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
         }
 
         this.buttonDisabled = true;
         this.buttonTxt = 'Application Submitted';
       }, error => {
-        this.alertService.add('bg-danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
+        this.alertService.add('danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
       });
     }
   }

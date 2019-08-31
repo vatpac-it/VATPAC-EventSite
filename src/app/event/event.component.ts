@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {Event} from '../models/Event';
 import {EventService} from '../services/event.service';
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {Title} from "@angular/platform-browser";
+import {DomSanitizer, SafeUrl, Title} from "@angular/platform-browser";
 import {CoreResponse} from "../models/CoreResponse";
 import {AlertService} from "../services/alert.service";
 
@@ -14,14 +14,15 @@ import {AlertService} from "../services/alert.service";
 export class EventComponent implements OnInit {
 
   event: Event;
+  bgLocation: SafeUrl;
 
-  constructor(private eventService: EventService, private alertService: AlertService, private titleService: Title, private activeRoute: ActivatedRoute, private router: Router) {
+  constructor(private eventService: EventService, private alertService: AlertService, private titleService: Title, private activeRoute: ActivatedRoute, private router: Router, private _sanitizer: DomSanitizer) {
     const event_sku = this.activeRoute.snapshot.paramMap.get('sku');
 
     this.eventService.getEvent(event_sku).subscribe((res) => {
       res = new CoreResponse(res);
       if (!res.success()) {
-        this.alertService.add('bg-danger', 'Error getting Event.');
+        this.alertService.add('danger', 'Error getting Event.');
         return router.navigate(['/']);
       }
 
@@ -38,6 +39,8 @@ export class EventComponent implements OnInit {
 
       this.event.airports = this.event.airports.sort((a, b) => (a.kind === 'departing') ? -1 : (b.kind === 'departing' ? 1 : (a.kind === 'arriving' ? 1 : (b.kind === 'arriving' ? -1 : 0))))
 
+      if (event.backgroundImage) this.bgLocation = this._sanitizer.bypassSecurityTrustStyle(`url(https://core.vatpac.org/files/${event.backgroundImage})`);
+
       const sel = [];
       this.event.selected.forEach(s => {
         s.positions.forEach(p => {
@@ -46,7 +49,7 @@ export class EventComponent implements OnInit {
       });
       this.event.selected = sel;
     }, (err) => {
-      this.alertService.add('bg-danger', 'Error getting Event.');
+      this.alertService.add('danger', 'Error getting Event.');
       return this.router.navigate(['/']);
     });
   }

@@ -1,7 +1,7 @@
 <div *ngIf="event" class="overflow-hidden">
   <app-topnav></app-topnav>
 
-  <div class="header--hero jumbotron jumbotron-fluid d-flex align-items-end">
+  <div class="header--hero jumbotron jumbotron-fluid d-flex align-items-end" [style.background-image]="bgLocation">
     <div class="container my-4">
 
       <h1 class="display-2 text-white">{{event.title}}</h1>

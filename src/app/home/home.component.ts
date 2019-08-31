@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit {
     eventService.getMinEvents().subscribe((res) => {
       res = new CoreResponse(res);
       if (!res.success()) {
-        alertService.add('bg-danger', 'Error getting events');
+        alertService.add('danger', 'Error getting events');
         return;
       }
 
