@@ -6,40 +6,40 @@
 }
 
 .content {
-  margin-top: 50px;
+  /*margin-top: 50px;*/
   width: 100%;
   overflow: hidden;
 }
 
 /*MEDIA QUERY*/
-@media only screen and (max-width : 1019px) {
-  .beta-banner {
-    font-size: 0.9rem;
-  }
-}
+/*@media only screen and (max-width : 1019px) {*/
+/*  .beta-banner {*/
+/*    font-size: 0.9rem;*/
+/*  }*/
+/*}*/
 
-@media only screen and (max-width : 927px) {
-  .beta-banner {
-    height: 70px;
-  }
+/*@media only screen and (max-width : 927px) {*/
+/*  .beta-banner {*/
+/*    height: 70px;*/
+/*  }*/
 
-  .content {
-    margin-top: 70px;
-  }
-}
+/*  .content {*/
+/*    margin-top: 70px;*/
+/*  }*/
+/*}*/
 
-@media only screen and (max-width : 450px) {
-  .beta-banner {
-    height: 80px;
-  }
+/*@media only screen and (max-width : 450px) {*/
+/*  .beta-banner {*/
+/*    height: 80px;*/
+/*  }*/
 
-  .content {
-    margin-top: 80px;
-  }
-}
+/*  .content {*/
+/*    margin-top: 80px;*/
+/*  }*/
+/*}*/
 
-@media only screen and (max-width : 322px) {
-  .beta-banner {
-    font-size: 0.8rem;
-  }
-}
+/*@media only screen and (max-width : 322px) {*/
+/*  .beta-banner {*/
+/*    font-size: 0.8rem;*/
+/*  }*/
+/*}*/

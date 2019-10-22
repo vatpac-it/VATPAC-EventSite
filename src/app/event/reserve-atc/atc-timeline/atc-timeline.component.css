@@ -6,6 +6,7 @@
 .timeline {
   left: 0;
   height: 65px;
+  min-width: 100%;
   list-style-type: none;
   display: flex;
   align-items: center;
@@ -14,6 +15,7 @@
 
 .timeline li {
   transition: all 200ms ease-in;
+  flex: 1 0;
 }
 
 .timeline li .title {
@@ -29,6 +31,7 @@
 .timeline li .status {
   padding: 0 40px;
   width: 100%;
+  min-width: 190px;
   display: flex;
   justify-content: center;
   border-top: 2px solid #D6DCE0;

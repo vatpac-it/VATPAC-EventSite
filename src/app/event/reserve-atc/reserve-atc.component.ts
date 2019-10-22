@@ -30,15 +30,15 @@ export class ReserveATCComponent implements OnInit {
   buttonTxt = 'Save All Selected Times';
   buttonDisabled = true;
 
-  currentFilter = {airport: '', postion: ''};
+  currentFilter = {airport: '', position: ''};
   currentDate: Date;
   timesChanged = false;
 
   @Input() public selectedTimes: SelectedTimes[] = [];
 
-  public filteredTimes: { airport: string, position: string, times: Array<Time> }[] = [];
+  public filteredTimes: { airport: string, modifier: string, position: string, times: Array<Time> }[] = [];
 
-  public times: { airport: string, position: string, times: Array<Time> }[] = [];
+  public times: { airport: string, modifier: string, position: string, times: Array<Time> }[] = [];
 
   constructor(private eventService: EventService, private userService: UserService, private activeRoute: ActivatedRoute, private alertService: AlertService) {
   }
@@ -50,14 +50,28 @@ export class ReserveATCComponent implements OnInit {
   ngOnInit() {
     let currentDate = this.start;
     while (currentDate <= this.end) {
-      if (!(currentDate.isSameDateAs(this.end) && (currentDate.getHours() > this.end.getHours() || (currentDate.getHours() == this.end.getHours() && currentDate.getMinutes() >= this.end.getMinutes())))) this.dates.push(new Date(currentDate));
-      currentDate = ReserveATCComponent.addDays(currentDate, 1);
+      if (this.dates.findIndex(d => d.isSameDateAs(currentDate)) === -1) this.dates.push(new Date(currentDate));
+      currentDate = ReserveATCComponent.addHours(currentDate, 1);
     }
 
     for (let position of this.available) {
-      let el = position.split('_');
-      if (this.times.findIndex(e => e.position === el[1] && e.airport === el[0]) === -1) {
-        this.times.push({airport: el[0], position: el[1], times: []});
+      let el = position.split('-');
+      if (el[0] === position) {
+        el = position.split('_');
+        el[2] = el[1];
+        el[1] = '';
+      } else {
+        const t = el[1].split('_');
+        el[1] = t[0];
+        el[2] = t[1];
+      }
+      if (this.times.findIndex(e => (this.published === 1 && e.position === el[2]) || (e.airport === el[0] && e.modifier === el[1] && e.position === el[2] && this.published === 2)) === -1) {
+        this.times.push({
+          airport: this.published === 2 ? el[0] : '',
+          modifier: this.published === 2 ? el[1] : '',
+          position: el[2],
+          times: []
+        });
       }
       if (this.airports.indexOf(el[0]) === -1) {
         this.airports.push(el[0]);
@@ -83,7 +97,9 @@ export class ReserveATCComponent implements OnInit {
     this.timelineTimes = [];
 
     let empties = [];
-    for (let s = this.getStartTime(start); s <= (this.getEndTime(start) - this.shifts); s += this.shifts) {
+    const sa = this.getNumTime(start);
+    const ea = this.getEndTime(start);
+    for (let s = sa; s < ea; s += this.shifts) {
       const e = s + this.shifts;
 
       const o_s = this.getOutTime(s);
@@ -92,6 +108,11 @@ export class ReserveATCComponent implements OnInit {
       if (!this.timelineTimes.includes(o_s)) this.timelineTimes.push(o_s);
 
       empties.push(<Time>{start: o_s, end: o_e, user: null, available: true});
+    }
+    if (sa > ea) {
+      const o_s = this.getOutTime(sa);
+      empties.push(<Time>{start: o_s, end: 0, user: null, available: true});
+      this.timelineTimes.push(o_s);
     }
 
     for (let position in this.times) {
@@ -103,7 +124,12 @@ export class ReserveATCComponent implements OnInit {
         const d = new Date(position.date);
         if (d.isSameDateAs(start)) {
           for (let time of this.times) {
-            if (time.airport === position.airport.icao && time.position === position.position) {
+            let t = position.position.split('_');
+            if (t.length === 1) {
+              t[1] = t[0];
+              t[0] = '';
+            }
+            if (time.airport === position.airport.icao && t[0] === time.modifier && t[1] === time.position) {
               const s = this.getNumTime(d);
               const o_s = this.getOutTime(s);
               const o_e = this.getOutTime(s + this.shifts);
@@ -156,7 +182,7 @@ export class ReserveATCComponent implements OnInit {
   }
 
   getEndTime(date: Date) {
-    if (date.toDateString() === this.end.toDateString()) {
+    if (date.isSameDateAs(this.end)) {
       return this.getNumTime(this.end);
     } else {
       return 1440;
@@ -188,18 +214,18 @@ export class ReserveATCComponent implements OnInit {
     return (hours * 100) + minutes;
   }
 
-  filterTimes(filter: { airport: string, postion: string }) {
+  filterTimes(filter: { airport: string, position: string }) {
     this.filteredTimes = this.times;
     this.currentFilter = filter;
 
-    if (filter.airport === '' && filter.postion === '') return;
+    if (filter.airport === '' && filter.position === '') return;
 
-    if (filter.airport === '' && filter.postion !== '') {
-      this.filteredTimes = this.times.filter(time => time.position.slice(-3) === filter.postion);
-    } else if (filter.airport !== '' && filter.postion === '') {
+    if (filter.airport === '' && filter.position !== '') {
+      this.filteredTimes = this.times.filter(time => time.position.slice(-3) === filter.position);
+    } else if (filter.airport !== '' && filter.position === '') {
       this.filteredTimes = this.times.filter(time => time.airport === filter.airport);
     } else {
-      this.filteredTimes = this.times.filter(time => time.airport === filter.airport && time.position.slice(-3) === filter.postion);
+      this.filteredTimes = this.times.filter(time => time.airport === filter.airport && time.position.slice(-3) === filter.position);
     }
   }
 
@@ -226,25 +252,29 @@ export class ReserveATCComponent implements OnInit {
     return [day, month, year].join('/');
   }
 
-  static addDays(date, days) {
+  static addHours(date, hours) {
     const dat = new Date(date);
-    dat.setDate(dat.getDate() + days);
+    dat.setHours(dat.getHours() + hours);
     return dat;
   }
 
   submitATC() {
     if (this.timesChanged) {
-      console.log(this.selectedTimes);
       this.eventService.submitATC(this.activeRoute.snapshot.paramMap.get('sku'), this.selectedTimes, this.hiddenCheckbox ? 1 : 0).subscribe((res) => {
         res = new CoreResponse(res);
         if (!res.success()) {
-          this.alertService.add('bg-danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
+          this.alertService.add('danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
         }
 
         this.buttonDisabled = true;
         this.buttonTxt = 'Application Submitted';
+
+        const this$ = this;
+        setTimeout(function () {
+          this$.buttonDisabled = false;
+        }, 5000);
       }, error => {
-        this.alertService.add('bg-danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
+        this.alertService.add('danger', 'Error submitting ATC. Please try again or contact it@vatpac.org.');
       });
     }
   }

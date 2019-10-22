@@ -9,6 +9,7 @@ export class Event {
   start: Date | string;
   end: Date | string;
   published: number | string;
+  backgroundImage: string;
   sections: {_id?: number, title: string, content: string, files: {_id: number | string, name: string, file?: SafeUrl}[]}[];
   airports: {airport: {_id: string, icao: string}, kind: string}[];
   available: string[];
@@ -25,6 +26,7 @@ export class Event {
     this.end = new Date(Date.now() + 259200000);
     this.sections = [];
     this.published = 0;
+    this.backgroundImage = '';
     this.airports = [];
     this.available = [];
     this.positions = [];

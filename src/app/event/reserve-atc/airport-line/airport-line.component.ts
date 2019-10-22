@@ -8,8 +8,8 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 export class AirportLineComponent implements OnInit {
 
   @Input() airport: string;
-  @Input() currentFilter: {airport: string, postion: string};
-  @Output() airportFilter = new EventEmitter<{airport: string, postion: string}>();
+  @Input() currentFilter: {airport: string, position: string};
+  @Output() airportFilter = new EventEmitter<{airport: string, position: string}>();
   @Input() positions: string[] = [];
 
   constructor() { }
@@ -18,7 +18,7 @@ export class AirportLineComponent implements OnInit {
   }
 
   setFilter(airport: string, position: string) {
-    this.airportFilter.emit({airport: airport, postion: position});
+    this.airportFilter.emit({airport: airport, position: position});
   }
 
   getColour(position): string {

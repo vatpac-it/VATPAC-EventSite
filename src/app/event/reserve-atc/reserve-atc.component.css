@@ -30,7 +30,8 @@
   font-weight: 500;
   white-space:nowrap;
   /*line-height: 117px;*/
-  padding: 58px 0 20px;
+  padding: 38px 0 20px;
+  text-align: right;
 }
 
 .position-title.base-title {
@@ -45,8 +46,10 @@
 }
 
 .timeline {
+  margin-top: 25px;
   left: 0;
   height: 65px;
+  min-width: 100%;
   list-style-type: none;
   display: flex;
   align-items: center;
@@ -56,11 +59,13 @@
 .timeline li {
   transition: all 200ms ease-in;
   position: relative;
+  flex: 1 0;
 }
 
 .timeline li .status {
   padding: 0 40px;
-  width: 190px;
+  width: 100%;
+  min-width: 190px;
   display: flex;
   justify-content: center;
   border-top: 2px solid rgb(57, 138, 246);

@@ -18,6 +18,15 @@
   z-index: 1;
 }
 
+.text-title {
+  hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+}
+
 .header--hero .container {
   position: relative;
   z-index: 50;
@@ -57,6 +66,11 @@ section {
 
   .about-info--container .divider.horizontal {
     width: 90%;
+  }
+
+
+  .text-title {
+    font-size: 4rem !important;
   }
 
 }
