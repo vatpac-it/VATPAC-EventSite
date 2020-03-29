@@ -1,0 +1,84 @@
+<div *ngIf="!disabled else disabledATC">
+  <div class="row justify-content-center my-3 px-3">
+    <div class="btn-group" role="group" aria-label="Reservation Dates">
+      <button *ngFor="let date of dates" type="button" [class]="'btn ' + (date.isSameDateAs(currentDate) ? 'btn-primary' : 'btn-outline-primary')" (click)="setTimesForDay(date)">{{formatDate(date)}}</button>
+    </div>
+  </div>
+
+  <div *ngIf="published == 1">
+    <p class="text-muted text-center small my-4 px-4">The positions are only preferences. If a position is already filled
+      or a more suitable controller is rostered , you will be rostered onto the next most suitable position. If you have
+      any questions regarding rostering please email <a href="mailto:events@vatpac.org">events@vatpac.org</a>)</p>
+
+    <div class="atc-timeline--container">
+      <div class="timeline-labels">
+        <span *ngFor="let time of times" class="position-title">{{time.position}}</span>
+        <span class="position-title base-title">(Your Browser Local Time)</span>
+      </div>
+
+      <div class="timelines--container">
+        <app-atc-timeline *ngFor="let time of times" [time]="time" [selectable]="true"
+                          [selectedTimes]="getSelectedTimesForDate(time.position)"
+                          (selectTimesEvent)="saveSelectedTimes(time.position, $event)"
+                          [shifts]="shifts"></app-atc-timeline>
+
+        <ul class="timeline">
+          <li *ngFor="let time of timelineTimes">
+            <div class="status"></div>
+            <span>{{formatTime(time)}}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mx-2">
+      <div class="col-12 text-center custom-control custom-switch my-3">
+        <input class="custom-control-input" type="checkbox" [checked]="hiddenCheckbox"
+               (change)="hiddenCheckbox = !hiddenCheckbox" id="hideCheckbox">
+        <label class="custom-control-label" for="hideCheckbox">
+          Hide my name and rating from non logged in users
+        </label>
+      </div>
+
+      <p class="col-10 col-md-6 text-muted text-center small">(Event staff will still be able to view your name for
+        planning purposes, if you wish for this data to be hidden also please email <a href="mailto:it@vatpac.org">it@vatpac.org</a>)
+      </p>
+    </div>
+
+    <div *ngIf="userService.check('currentEvents.apply')" class="row">
+      <button class="col-10 col-sm-7 col-md-5 col-lg-4 btn btn-primary btn-lg mx-auto px-2"
+              [disabled]="!timesChanged || buttonDisabled"
+              (click)="submitATC()">{{timesChanged ? buttonTxt : 'Please select or deselect times'}}</button>
+    </div>
+  </div>
+
+
+  <div *ngIf="published == 2">
+    <app-airport-line *ngFor="let airport of airports" [airport]="airport" (airportFilter)="filterTimes($event)"
+                      [currentFilter]="currentFilter" [positions]="hasPositions(airport)"></app-airport-line>
+
+    <div class="atc-timeline--container">
+      <div class="timeline-labels">
+        <span *ngFor="let time of filteredTimes"
+              class="position-title">{{time.airport.slice(2, 4) + (time.modifier ? '-' + time.modifier : '') + '_' + time.position}}</span>
+        <span class="position-title base-title">(Browser Local)</span>
+      </div>
+
+      <div class="timelines--container">
+        <app-atc-timeline *ngFor="let time of filteredTimes" [time]="time" [selectable]="false"
+                          [shifts]="shifts"></app-atc-timeline>
+
+        <ul class="timeline">
+          <li *ngFor="let time of timelineTimes">
+            <div class="status"></div>
+            <span>{{formatTime(time)}}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #disabledATC>
+  <h5 class="text-warning text-center">Please either rotate your device to landscape or use a larger screen to {{published === 1 ? 'reserve' : 'view'}} ATC.</h5>
+</ng-template>

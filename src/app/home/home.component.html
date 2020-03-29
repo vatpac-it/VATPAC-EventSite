@@ -1,0 +1,21 @@
+<div class="py-5">
+  <img class="d-block mx-auto" src="../../assets/img/vatpac-logo.png" alt="VATPAC">
+  <h1>Events</h1>
+
+  <button class="btn btn-primary d-block my-3 mx-auto" (click)="togglePastEvents()">{{showingPastEvents ? 'Hide' : 'Show'}} Past Events</button>
+
+  <div class="event--container container">
+    <div class="row justify-content-around">
+      <a class="event card" *ngFor="let event of events" [class.draft]="event.published === 0" [routerLink]="event.sku">
+        <img *ngIf="event.backgroundImage" src="https://core.vatpac.org/files/{{event.backgroundImage}}" alt="" class="card-img-top">
+        <span class="card-body">
+        <span *ngIf="event.published === 0" class="draft--note">Unpublished</span>
+        <h5 class="card-text">{{event.title.toLowerCase()}}</h5>
+        <p>{{event.subtitle.toLowerCase()}}</p>
+        <span>{{event.start}}</span>
+      </span>
+      </a>
+    </div>
+    <p class="noEvents text-center py-5" *ngIf="!events || events.length <= 0">There are no published event pages.</p>
+  </div>
+</div>

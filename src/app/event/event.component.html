@@ -1,0 +1,52 @@
+<div *ngIf="event" class="overflow-hidden">
+  <app-topnav></app-topnav>
+
+  <div class="header--hero jumbotron jumbotron-fluid d-flex align-items-end" [style.background-image]="bgLocation">
+    <div class="container my-4">
+
+      <h1 class="text-title display-2 text-white">{{event.title}}</h1>
+      <h2 class="text-info pl-2 mt-n2">{{event.subtitle}}</h2>
+    </div>
+  </div>
+
+  <div id="aboutAnchor" class="container mx-3 mx-sm-auto">
+    <div class="row justify-content-around">
+      <app-about [title]="'Start'" [line1]="formatDate(event.start)" [line2]="formatTime(event.start)" [icon]="'clock'"></app-about>
+      <app-about [title]="'End'" [line1]="formatDate(event.end)" [line2]="formatTime(event.end)" [icon]="'clock'"></app-about>
+    </div>
+
+    <app-countdown *ngIf="event.start >= currentDate" [date]="event.start"></app-countdown>
+
+    <hr class="my-5">
+
+    <div class="row justify-content-around">
+      <h1 class="w-100 m-0">Where</h1>
+      <app-about *ngFor="let airport of event.airports" [line1]="airport.airport.icao" [line2]="capitalize(airport.kind)" [icon]="airport.kind === 'departing' ? 'plane-departure' : (airport.kind === 'arriving' ? 'plane-arrival' : 'plane')"></app-about>
+    </div>
+
+  </div>
+
+  <section id="infoAnchor">
+    <h1 class="display-4 text-center">Event Info</h1>
+
+    <div class="container pt-3 pt-md-5 pb-4 px-3 px-md-5" *ngFor="let section of event.sections">
+      <h1 class="mb-4">{{section.title}}</h1>
+
+      <p [innerHTML]="section.content"></p>
+      <!--<app-pilot-info [event]="event"></app-pilot-info>-->
+    </div>
+  </section>
+
+  <section id="atcAnchor" *ngIf="event.published > 0">
+    <h1 class="display-4 text-center">Reserve ATC</h1>
+
+    <div class="container-fluid mt-4">
+      <app-reserve-atc [positions]="event.positions" [available]="event.available" [shifts]="event.shiftLength" [start]="event.start" [end]="event.end" [selectedTimes]="event.selected || []"
+                       [published]="event.published"></app-reserve-atc>
+    </div>
+  </section>
+
+  <div class="footer">
+    <p>&#169; VATPAC 2019</p>
+  </div>
+</div>

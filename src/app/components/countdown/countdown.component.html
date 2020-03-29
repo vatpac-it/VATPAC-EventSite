@@ -1,0 +1,21 @@
+<div *ngIf="timeLeft !== 0" class="row justify-content-start justify-content-md-around mx-2 mt-3">
+  <p class="w-100 text-muted mb-n1">Time till event...</p>
+  <div class="row align-items-baseline mx-2">
+    <span class="display-1">{{days}}</span>
+    <p class="h4 pl-2">days</p>
+  </div>
+  <div class="row align-items-baseline mx-2">
+    <span class="display-1">{{hours}}</span>
+    <p class="h4 pl-2">hours</p>
+  </div>
+  <div class="row align-items-baseline mx-2">
+    <span class="display-1">{{minutes}}</span>
+    <p class="h4 pl-2">minutes</p>
+  </div>
+  <div class="row align-items-baseline mx-2">
+    <span class="display-1">{{seconds}}</span>
+    <p class="h4 pl-2">seconds</p>
+  </div>
+</div>
+
+<h3 *ngIf="timeLeft === 0" class="text-warning text-center mt-2">This event has already past</h3>

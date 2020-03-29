@@ -1,0 +1,58 @@
+h1 {
+  text-align: center;
+  font-weight: lighter;
+  margin: 30px 0;
+}
+
+.event--container .event {
+  margin: 20px;
+  min-width: 14rem;
+  min-height: 5rem;
+  text-decoration: none;
+  color: #000;
+  transition: all 250ms;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+
+.event--container .event .card-img-top {
+  max-height: 300px;
+  max-width: 300px;
+}
+
+.event--container .event.draft {
+  background-color: rgba(255, 63, 63, 0.15);
+}
+
+.event--container .event .draft--note {
+  color: #808080;
+  text-transform: uppercase;
+}
+
+.event--container .event h5 {
+  text-transform: capitalize;
+}
+
+.event--container .event p {
+  margin: 3px 0;
+  font-size: 18px;
+  text-transform: capitalize;
+}
+
+.event--container .event:hover, .event--container .event:focus {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  -webkit-transform: translateY(-5px);
+  transform: translateY(-5px);
+}
+
+.event--container .event:active {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+}
+
+p.noEvents {
+  color: #818181;
+}
