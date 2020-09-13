@@ -14,7 +14,7 @@ import {UserService} from '../services/user.service';
 })
 export class HomeComponent implements OnInit {
 
-    currentEvents: Event[];
+    currentEvents: Event[] = [];
     pastEvents: Event[];
     showingPastEvents = false;
     fetchedPastEvents = false;

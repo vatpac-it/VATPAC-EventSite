@@ -45,7 +45,7 @@
       </p>
     </div>
 
-    <div *ngIf="userService.check('currentEvents.apply')" class="row">
+    <div *ngIf="userService.check('events.apply')" class="row">
       <button class="col-10 col-sm-7 col-md-5 col-lg-4 btn btn-primary btn-lg mx-auto px-2"
               [disabled]="!timesChanged || buttonDisabled"
               (click)="submitATC()">{{timesChanged ? buttonTxt : 'Please select or deselect times'}}</button>
@@ -80,5 +80,10 @@
 </div>
 
 <ng-template #disabledATC>
-  <h5 class="text-warning text-center">Please either rotate your device to landscape or use a larger screen to {{published === 1 ? 'reserve' : 'view'}} ATC.</h5>
+  <div *ngIf="!userService.loggedIn() && published === 1; else screenSizeError">
+    <h5 class="text-warning text-center">Please login to reserve ATC.</h5>
+  </div>
+  <ng-template #screenSizeError>
+    <h5 class="text-warning text-center">Please either rotate your device to landscape or use a larger screen to {{published === 1 ? 'reserve' : 'view'}} ATC.</h5>
+  </ng-template>
 </ng-template>

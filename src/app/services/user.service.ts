@@ -43,12 +43,6 @@ export class UserService {
         return this.jwt_token.value;
     }
 
-    private redirectToLogin() {
-        if (this.router.url !== '/login') {
-            this.router.navigate(['/login']);
-        }
-    }
-
     private getUser() {
         new HttpClient(this.httpBackend).get<CoreResponse>(url + '/sso/user', {
             withCredentials: true,
@@ -59,13 +53,11 @@ export class UserService {
             .subscribe((res) => {
                 res = new CoreResponse(res);
                 if (!res.success() || !res.body || !res.body.user) {
-                    this.redirectToLogin();
                     return;
                 }
 
                 this.currentUserSubject.next(res.body.user);
             }, _ => {
-                this.redirectToLogin();
             });
     }
 
@@ -76,7 +68,6 @@ export class UserService {
             next: res => {
                 res = new CoreResponse(res);
                 if (!res.success() || !res.body || !res.body.jwt_token || !res.body.jwt_token_expiry) {
-                    this.redirectToLogin();
                     return;
                 }
 
@@ -93,23 +84,25 @@ export class UserService {
                 }, time >= 30000 ? time : 30000);
             },
             error: _ => {
-                this.redirectToLogin();
             }
         });
     }
 
     public login(sku: string) {
-        window.location.href = url + '/sso?callback=' + encodeURIComponent(environment.base_url = (sku ? `/${sku}` : ''));
+        window.location.href = url + '/sso?callback=' + encodeURIComponent(environment.base_url + (sku ? `/${sku}` : ''));
     }
 
     public logout() {
-        this.jwt_token.next(null);
-
         return new HttpClient(this.httpBackend).get(`${url}/sso/logout`,
-            {withCredentials: true}).subscribe({
+            {
+                withCredentials: true,
+                headers: new HttpHeaders({
+                    'Authorization': `Bearer ${this.currentJWT.token}`
+                })
+            }).subscribe({
             complete: () => {
+                this.jwt_token.next(null);
                 localStorage.setItem('logout', String(Date.now()));
-                this.redirectToLogin();
             }
         });
     }
@@ -118,7 +111,6 @@ export class UserService {
         if (ev.key === 'logout') {
             console.log('Logged out in storage');
             this.jwt_token.next(null);
-            this.redirectToLogin();
         }
     }
 
